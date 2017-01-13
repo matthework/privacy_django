@@ -1,0 +1,85 @@
+/* Overall */
+header .container{
+  width: 100%;
+  padding:0px;
+  margin:0px;
+  background-color: black;
+}
+nav {
+  margin-bottom: 0px !important;
+}
+a {
+  cursor: pointer;
+  cursor: hand;
+}
+label {
+  width: 7em;
+}
+input{
+  margin-right: 5px;
+}
+select {
+  margin-right: 10px;
+}
+textarea {
+  margin-right: 10px;
+}
+table {
+  table-layout: auto;
+  border-collapse: collapse;
+  padding: 5px;
+  margin-bottom: 20px;
+}
+table tr:nth-child(odd) {
+  background-color: #f1f1f1;
+}
+table tr:nth-child(even) {
+  background-color: #ffffff;
+}
+th , td  {
+  border-collapse: collapse;
+  padding: 5px;
+}
+@media screen and (max-width: 700px) {
+  .wide-only{
+    display:none;
+  }
+}
+
+/* List */
+.docs-header{
+  width: 100%;
+  background-color: #1E3D5a;
+  display: inline-block;
+  padding-top: 25px;
+  padding-bottom: 25px;
+  margin-bottom: 25px;
+  color: white;
+}
+
+.header{
+  font-weight: 600;
+}
+
+.div-list-item{
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px #ddd solid;
+}
+
+.div-list-item:hover{
+  background-color:#eee;
+}
+.div-list-item div{
+  padding-top: 5px;
+}
+
+.btn.wrap{
+  white-space: inherit;
+}
+
+.padding-large-vertical{
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+

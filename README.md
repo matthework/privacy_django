@@ -27,3 +27,11 @@ $ python manage.py makemigrations privacy
 $ python manage.py migrate privacy  
 
 $ python manage.py createsuperuser  
+
+$ heroku login  
+
+$ heroku apps  
+
+$ heroku run --app privacy-django python manage.py migrate  
+
+$ heroku run --app privacy-django python manage.py createsuperuser  
