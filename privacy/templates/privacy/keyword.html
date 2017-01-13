@@ -1,0 +1,25 @@
+{% extends 'privacy/base.html' %}
+
+{% block content %}
+
+{% load staticfiles %}
+<link rel="stylesheet" href="{% static 'css/main.css' %}">
+
+<!-- Header -->
+<div class="docs-header">
+   <h1 class=" col-md-10 col-md-offset-1">Keywords</h1>
+</div>
+
+<!-- Content -->
+<div class="col-md-10 col-md-offset-1">
+
+{% for kw in kws %}
+    <div>
+        <h2><a href="">{{ kw.category }}</a></h2>
+        <h4><a href="">{{ kw.name }}</a></h4>
+    </div>
+{% endfor %}
+
+</div>
+
+{% endblock %}

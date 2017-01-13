@@ -14,6 +14,10 @@ $ pip install --upgrade pip
 
 $ pip install django  
 
+$ pip install dj-database-url gunicorn whitenoise  
+
+$ pip freeze > requirements.txt  
+
 $ django-admin.py startproject mysite .  
 
 $ python manage.py migrate  
