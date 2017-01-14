@@ -42,9 +42,10 @@ th , td  {
 }
 @media screen and (max-width: 700px) {
   .wide-only{
-    display:none;
+    display:none; 
   }
 }
+
 
 /* List */
 .docs-header{
@@ -83,3 +84,19 @@ th , td  {
   padding-bottom: 20px;
 }
 
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 60px;
+  background-color: #f5f5f5;
+}
+.container .text-muted {
+  margin: 20px 0;
+}
+
+.footer > .container {
+  padding-right: 15px;
+  padding-left: 15px;
+}
