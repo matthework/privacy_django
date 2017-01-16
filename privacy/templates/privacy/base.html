@@ -1,10 +1,15 @@
 {% load staticfiles %}
-<html>
+<!DOCTYPE html>
+<html lang="en">
     <head>
         <title>Privacy App</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
         <!-- Latest compiled and minified CSS -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
         <link rel="stylesheet" href="{% static 'css/style.css' %}">
+        <script src='https://code.responsivevoice.org/responsivevoice.js'></script>
     </head>
     <body>
         <header>
@@ -40,10 +45,12 @@
             {% block content %}
              {% endblock %}
         </div>
+        <br>
+        <br>
 
-        <footer class="footer navbar-fixed-bottom">
-          <div class="container col-md-10 col-md-offset-1">
-            <p class="text-muted">Copyright © 2017 Master Project by Matt Wang, All Rights Reserved.</p>
+        <footer class="footer">
+          <div class="col-md-7 col-md-offset-1">
+          <p class="text-muted text-center">Copyright © 2017 Master Project by Matt Wang, All Rights Reserved.</p>
           </div>
         </footer>
         
