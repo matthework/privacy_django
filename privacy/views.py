@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from .models import Keyword
-from .mycode import doWeb
-import html
+from .mycode import doWeb, doDoc
+
 
 def main(request):
     kws = Keyword.objects.order_by('created_date')	
@@ -10,17 +10,24 @@ def main(request):
 
 def web(request):
 	kws = Keyword.objects.order_by('created_date')
-	url = ""
-	out = ""
+	url = ''
+	out = ''
 	if request.GET.get('gobtn'):
 		url = request.GET.get('url')
-		out = doWeb(kws, url)
+		print('url1: ' + url)
+		out = '<strong>Result: </strong><br><br>' + doWeb(kws, url)
 	context = {'kws': kws, 'out': out}
 	return render(request, 'privacy/web.html', context)
 
 def doc(request):
 	kws = Keyword.objects.order_by('created_date')
-	context = {'kws': kws}
+	path = ''
+	out = ''
+	if request.GET.get('filebtn'):
+		path = request.GET.get('doc')
+		print('path1: ' + path)
+		out = '<strong>Result: </strong><br><br>' + doDoc(kws, path)
+	context = {'kws': kws, 'out': out}
 	return render(request, 'privacy/doc.html', context)
 
 def keyword(request):

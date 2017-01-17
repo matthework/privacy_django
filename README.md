@@ -39,3 +39,5 @@ $ heroku apps
 $ heroku run --app privacy-django python manage.py migrate  
 
 $ heroku run --app privacy-django python manage.py createsuperuser  
+
+$ pip install -U nltk
