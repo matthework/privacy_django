@@ -102,7 +102,7 @@ def doDoc(kws, path):
 		print(e.reason)
 		result = 'The url is invalid or the file is not found!'
 
-	return '<strong>' + name + '</strong><br><br>' + result
+	return '<strong>' + name + '<br>(' + path + ')</strong><br><br>' + result
 
 
 def processRaw(kws, raw):

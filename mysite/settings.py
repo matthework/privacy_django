@@ -128,7 +128,7 @@ STATIC_URL = '/static/'
 
 # ALLOWED_HOSTS = ['*']
 
-DEBUG = False
+# DEBUG = False
 
 try:
     from .local_settings import *
