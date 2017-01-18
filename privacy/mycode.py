@@ -3,6 +3,8 @@ from nltk import word_tokenize
 from urllib import request, error
 from bs4 import BeautifulSoup
 
+nltk.data.path.append('./nltk_data/')
+
 
 def doWeb(kws, url):
 	result = ''
