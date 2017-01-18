@@ -28,9 +28,10 @@ def doWeb(kws, url):
 			raw = BeautifulSoup(html, 'html.parser').body.get_text()
 			title = BeautifulSoup(html, 'html.parser').title.string
 			result = processRaw(kws, raw)
-		except error.URLError as e:
-			print(e.reason)
-			result = 'The url is invalid or the webpage is not found!'
+		except Exception as e:
+			print(e)
+			result = 'Exception: ' + str(e)
+
 	return '<strong>' + title + '<br>(' + url + ')</strong><br><br>' + result
 
 
@@ -47,7 +48,7 @@ def doDoc(kws, path):
 	if path[1:3] != ':\\' and path[0:4] != 'http':
 		path = 'http://' + path
 	print('path2: ' + path)
-
+	
 	try:
 		# txt file
 		if '.' in name and name.split('.')[1].lower() == 'txt':
@@ -85,24 +86,20 @@ def doDoc(kws, path):
 			# memory_file = io.BytesIO(remote_file).getvalue()
 			# print(memory_file.decode('utf8'))
 			# print(str(memory_file,'utf-8'))
-			try:
-				doc = docx.Document(path)
-				fullText = []
-				for para in doc.paragraphs:
-					fullText.append(para.text)
-				raw = '\n'.join(fullText)
-			except Exception as e:
-				print(e)
-				result = 'The url is invalid or the file is not found!'
 
+			doc = docx.Document(path)
+			fullText = []
+			for para in doc.paragraphs:
+				fullText.append(para.text)
+			raw = '\n'.join(fullText)
 			result = processRaw(kws, raw)
 
 		else:
-			result = 'The url is invalid or the file is not found!'
+			result = 'Please use Web for webpage processing!'
 	
-	except error.URLError as e:
-		print(e.reason)
-		result = 'The url is invalid or the file is not found!'
+	except Exception as e:
+		print(e)
+		result = 'Exception: ' + str(e)
 
 	return '<strong>' + name + '<br>(' + path + ')</strong><br><br>' + result
 
