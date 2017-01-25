@@ -124,6 +124,29 @@ def processRaw(kws, raw):
 	return result + '<br><br><br><br><br><br>'
 
 
+def sortKey(kws, cats):
+	result = {}
+	for c in cats:
+		result[c] = []
+		for k in kws:
+			if k.category == c:
+				result[c].append(k.name.lower())
+
+	return result
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

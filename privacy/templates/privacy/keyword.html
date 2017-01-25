@@ -13,13 +13,23 @@
 <!-- Content -->
 <div class="col-md-10 col-md-offset-1">
 
-{% for kw in kws %}
-    <div>
-        <h2><a href="/admin/privacy/category">{{ kw.category }}</a></h2>
-        <h4><a href="/admin/privacy/keyword">{{ kw.name }}</a></h4>
+{% for key, value in sortkeys.items %}
+	<div>
+	<p class="text-justify">
+	<h2><a href="/admin/privacy/category">{{ key }}</a></h2>
+	{% for kw in value %}
+        <a href="/admin/privacy/keyword">{{ kw }}</a>
+    {% endfor %}
+    </p>
     </div>
 {% endfor %}
-
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
 </div>
+
 
 {% endblock %}

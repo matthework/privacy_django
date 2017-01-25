@@ -1,15 +1,15 @@
 from django.shortcuts import render
-from .models import Keyword
-from .mycode import doWeb, doDoc
+from .models import Keyword, Category
+from .mycode import doWeb, doDoc, sortKey
 
 
 def main(request):
-    kws = Keyword.objects.order_by('created_date')	
+    kws = Keyword.objects.order_by('name')	
     context = {'kws': kws}
     return render(request, 'privacy/main.html', context)
 
 def web(request):
-	kws = Keyword.objects.order_by('created_date')
+	kws = Keyword.objects.order_by('name')
 	url = ''
 	out = ''
 	if request.GET.get('gobtn'):
@@ -20,7 +20,7 @@ def web(request):
 	return render(request, 'privacy/web.html', context)
 
 def doc(request):
-	kws = Keyword.objects.order_by('created_date')
+	kws = Keyword.objects.order_by('name')
 	path = ''
 	out = ''
 	if request.GET.get('filebtn'):
@@ -31,8 +31,12 @@ def doc(request):
 	return render(request, 'privacy/doc.html', context)
 
 def keyword(request):
-	kws = Keyword.objects.order_by('created_date')
-	context = {'kws': kws}
+	kws = Keyword.objects.order_by('name')
+	cats = Category.objects.order_by('name')
+	sortkeys = {}
+	sortkeys = sortKey(kws, cats)
+	# print(sortkeys)
+	context = {'kws': kws, 'cats': cats, 'sortkeys': sortkeys}
 	return render(request, 'privacy/keyword.html', context)
 
 def about(request):
