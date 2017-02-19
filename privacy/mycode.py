@@ -138,9 +138,9 @@ def processRaw(kws, raw):
 
 	start = time.time()
 
-	# uds = Pool().map(getDependency, senlist)
+	uds = Pool().map(getDependency, senlist)
 
-	uds = getDependency(raw)
+	# uds = getDependency(raw)
 
 	print(uds)
 

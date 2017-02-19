@@ -18,6 +18,8 @@ $ pip install dj-database-url gunicorn whitenoise
 
 $ pip freeze > requirements.txt  
 
+$ pip install -r requirements.txt  
+
 $ django-admin.py startproject mysite .  
 
 $ python manage.py migrate  
@@ -73,6 +75,7 @@ $ for d in ddp:
 			print(d)  
 
 $ from nltk.parse.stanford import StanfordDependencyParser  
+
 $ dep_parser=StanfordDependencyParser(model_path="edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz")  
 
 $ [list(parse.triples()) for parse in dep_parser.raw_parse("The quick brown fox jumps over the lazy dog.")]  
