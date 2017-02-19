@@ -75,7 +75,7 @@ $ for d in ddp:
 $ from nltk.parse.stanford import StanfordDependencyParser  
 $ dep_parser=StanfordDependencyParser(model_path="edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz")  
 
-
+$ [list(parse.triples()) for parse in dep_parser.raw_parse("The quick brown fox jumps over the lazy dog.")]  
 
 
 

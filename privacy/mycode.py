@@ -131,33 +131,6 @@ def processRaw(kws, raw):
 	# else:
 	# 	result = 'The url is invalid or the file is not found!'
 
-	
-	# out = {}
-	# sen1 = """The cost of cyber-crime for the global economy has been estimated at $445 billion ( 266 billion) annually."""
-	# sen2 = """Cyber-espionage and stealing individuals' personal information is believed to have affected more than 800 million people during 2013."""
-
-
-	# process_a = multiprocessing.Process(target=getDependency(dep_parser,sen1))
-	# process_b = multiprocessing.Process(target=getDependency(dep_parser,sen2))
-
-	# process_b.start()
-	# process_a.start()
-
-
-	# process_a.join
-	# process_b.join
-
-	# a_thread = threading.Thread(target=getDependency(dep_parser,sen1))
-	# a_thread.start()
-
-	# b_thread = threading.Thread(target=getDependency(dep_parser,sen2))
-	# b_thread.start()
-
-	# a_thread.join()
-	# b_thread.join()
-
-	# uds1 = [list(parse.triples()) for parse in dep_parser.raw_parse(sen1)]
-	# uds2 = [list(parse.triples()) for parse in dep_parser.raw_parse(sen2)]
 
 	senlist = raw.split('. ')
 	# for index, s in enumerate(senlist):
@@ -165,9 +138,11 @@ def processRaw(kws, raw):
 
 	start = time.time()
 
-	results = Pool().map(getDependency, senlist)
+	# uds = Pool().map(getDependency, senlist)
 
-	print(results)
+	uds = getDependency(raw)
+
+	print(uds)
 
 	# uds = [list(parse.triples()) for parse in dep_parser.raw_parse(raw)]
 	end = time.time()
@@ -183,6 +158,7 @@ def getDependency(sen):
 	dep_parser=StanfordDependencyParser(model_path="edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz")
 	uds = [list(parse.triples()) for parse in dep_parser.raw_parse(sen)]
 	return str(uds)
+
 
 def sortKey(kws, cats):
 	result = {}
