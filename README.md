@@ -80,9 +80,13 @@ $ dep_parser=StanfordDependencyParser(model_path="edu/stanford/nlp/models/lexpar
 
 $ [list(parse.triples()) for parse in dep_parser.raw_parse("The quick brown fox jumps over the lazy dog.")]  
 
+$ pip install pexpect  
 
+$ pip install unidecode  
 
+$ pip install jsonrpclib  
 
+$ pip install jsonrpclib-pelix  
 
 
 

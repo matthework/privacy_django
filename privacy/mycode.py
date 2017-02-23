@@ -7,6 +7,7 @@ import time
 # import threading
 # import multiprocessing
 from multiprocessing import Pool
+import jsonrpclib
 
 nltk.data.path.append('./nltk_data/')
 
@@ -110,8 +111,8 @@ def doDoc(kws, path):
 
 
 def processRaw(kws, raw):
-	# # kws = ["prove", "identity", "approval", "gain", "allowed", "password", "passwords", "username", "authentication", "access", "code" , "secret"]
-	# kws = ["cost", "cyber-crime", "estimated", "$", "445", "billion", "266", "cyber-espionage", "stealing", "individuals", "information", "believed", "800", "million", "people", "financial-losses", "cyber-theft", "cause", "150,000", "europeans", "lose", "jobs", "report", "conducted", "internet-security", "company-mcafee", "damages", "trade", "nations", "competitiveness", "innovation", "growth", "slows", "pace", "mcafee", "calling", "governments", "begin", "effort", "collect", "publish", "data", "help", "countries", "companies", "make", "choices", "risk" , "policy"]
+	# kws = ["prove", "identity", "approval", "gain", "allowed", "password", "passwords", "username", "authentication", "access", "code" , "secret"]
+	# kws = ["cost", "cyber-crime1", "estimated", "$", "445", "billion", "Cyber", "espionage", "stealing", "individuals", "information1", "800", "million", "people", "Financial", "losses", "cyber-theft", "lose", "jobs"]
 	# if raw:
 	# 	tokens = word_tokenize(raw)
 	# 	print(len(tokens))
@@ -138,11 +139,11 @@ def processRaw(kws, raw):
 
 	start = time.time()
 
-	uds = Pool().map(getDependency, senlist)
+	# uds = Pool().map(getDependency, senlist)
 
-	# uds = getDependency(raw)
+	uds = getDependency(raw)
 
-	print(uds)
+	# print(uds)
 
 	# uds = [list(parse.triples()) for parse in dep_parser.raw_parse(raw)]
 	end = time.time()
