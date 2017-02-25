@@ -5,12 +5,13 @@ from bs4 import BeautifulSoup
 from nltk.parse.stanford import StanfordDependencyParser
 import time
 from multiprocessing import Pool
-import jsonrpclib
+from nltk.corpus import stopwords
+
 
 nltk.data.path.append('./nltk_data/')
 
 
-def doWeb(kws, url):
+def doWeb(kset, url):
 	result = ''
 	title = ''
 	if url[0:4] == 'eg: ':
@@ -31,7 +32,7 @@ def doWeb(kws, url):
 			html = request.urlopen(url).read().decode('utf8')
 			raw = BeautifulSoup(html, 'html.parser').body.get_text()
 			title = BeautifulSoup(html, 'html.parser').title.string
-			result = processRaw(kws, raw)
+			result = processRaw(kset, raw)
 		except Exception as e:
 			print(e)
 			result = 'Exception: ' + str(e)
@@ -39,7 +40,7 @@ def doWeb(kws, url):
 	return '<strong>' + title + '<br>(' + url + ')</strong><br><br>' + result
 
 
-def doDoc(kws, path):
+def doDoc(kset, path):
 	result = ''
 	raw = ''
 	name = ntpath.basename(path)
@@ -60,7 +61,7 @@ def doDoc(kws, path):
 				path = 'file:///' + path
 			print('txt: ' + path)
 			raw = request.urlopen(path).read().decode('utf8')
-			result = processRaw(kws, raw)
+			result = processRaw(kset, raw)
 		
 		# tpdf file
 		elif '.' in name and name.split('.')[1].lower() == 'pdf':
@@ -79,7 +80,7 @@ def doDoc(kws, path):
 
 			for i in range(pnums):
 				raw += pdfReader.getPage(i).extractText()
-			result = processRaw(kws, raw)
+			result = processRaw(kset, raw)
 		
 		# docx file
 		elif '.' in name and name.split('.')[1].lower() == 'docx':
@@ -96,7 +97,7 @@ def doDoc(kws, path):
 			for para in doc.paragraphs:
 				fullText.append(para.text)
 			raw = '\n'.join(fullText)
-			result = processRaw(kws, raw)
+			result = processRaw(kset, raw)
 
 		else:
 			result = 'Please use Web for webpage processing!'
@@ -108,35 +109,22 @@ def doDoc(kws, path):
 	return '<strong>' + name + '<br>(' + path + ')</strong><br><br>' + result
 
 
-def processRaw(kws, raw):
+def processRaw(kset, raw):
 	result = ""
-	# kws = ["prove", "identity", "approval", "gain", "allowed", "password", "passwords", "username", "authentication", "access", "code" , "secret"]
-	# kws = ["cost", "cyber-crime1", "estimated", "$", "445", "billion", "Cyber", "espionage", "stealing", "individuals", "information1", "800", "million", "people", "Financial", "losses", "cyber-theft", "lose", "jobs"]
-	# if raw:
-	# 	tokens = word_tokenize(raw)
-	# 	print(len(tokens))
-	# 	kwords = []
-	# 	for k in kws:
-	# 		# kwords.append(k.name.lower())
-	# 		kwords.append(k.lower())
+	# second = 0.2
 
-	# 	text = []
-	# 	for s in tokens:
-	# 		if(s.lower() in kwords):
-	# 			tts = "<input onclick='responsiveVoice.speak(\\\"" + s + "\\\");' type='button' value='🔊 xxxxx' />"
-	# 			text.append(tts) 
-	# 		else:
-	# 			text.append(s)
-	# 	result = ' '.join(text)
-	# else:
-	# 	result = 'The url is invalid or the file is not found!'
+	cats = ['financial','cyber']
+	kws = []
+	for k in kset:
+		if k.category.name in cats:
+			kws.append(k.name.lower())
+	# print(kws)
 
-
-	# uds = [list(parse.triples()) for parse in dep_parser.raw_parse(raw)]
-
-	sen_list = raw.split('. ')
+	sent_detector = nltk.data.load('tokenizers/punkt/english.pickle')
+	sen_list = sent_detector.tokenize(raw.strip())
 	sen_list = list(filter(None, sen_list))
-	print(sen_list)
+	# print(sen_list)
+
 	pss_input = []
 	pss_list = []
 	for index, sen in enumerate(sen_list):
@@ -150,15 +138,9 @@ def processRaw(kws, raw):
 	print(pss_input)
 	print(pss_list)
 
-	# for index, s in enumerate(sen_list):
-	# 	print('('+ str(index) + ')' +s)
-
-	# kws_list = 
-
-	# uds_list = Pool().map(getDependency, sen_list)
 
 	# uds_list = getDependency(raw)
-
+	# uds_list = Pool().map(getDependency, sen_list)
 	# print(uds_list)
 
 	out_list = []
@@ -166,6 +148,8 @@ def processRaw(kws, raw):
 		start = time.time()
 		out_list = Pool().map(identityPSD, pss_input)
 		end = time.time()
+		t = end-start
+		print('Processing Time: ' + str(t))
 	else:
 		result = raw
 
@@ -173,16 +157,13 @@ def processRaw(kws, raw):
 	output = []
 	index_out = 0
 	for i, s in enumerate(sen_list):
-		if i in pss_list:
+		if len(out_list)>0 and i in pss_list:
 			output.append(out_list[index_out])
 			index_out +=1
 		else:
-			output.append(s+'.')
+			output.append(s)
 
 	result = ' '.join(output)
-
-
-	print('Processing Time: ' + str(end-start))
 
 	tokens = word_tokenize(raw)
 	print(len(tokens))
@@ -194,13 +175,45 @@ def processRaw(kws, raw):
 def searchKWS(sen, kws):
 	hasKWS = False
 	kws_index = []
-	tokens = word_tokenize(sen)
-	if tokens[0]=="The":
-		hasKWS = True
-		kws_index = [1, 10, 12, 14] 
+	tokens = [t.lower() for t in word_tokenize(sen)]
+
+	## round 1
+	s = ""
+	for kw in kws:
+		if kw in sen.lower():
+			s += kw + ' '
+
+	list1 = s.split(' ')
+	# print(list1)
 	for i, s in enumerate(tokens):
-		if i in kws_index:
-			print(s)
+		if s.lower() in list1:
+			kws_index.append(i)
+
+
+	## round 2
+	porter = nltk.PorterStemmer()
+	stem_tokens = [porter.stem(t) for t in tokens]  
+
+	stem_kws = [porter.stem(kw) for kw in kws]
+	# print(stem_kws) 
+
+
+	for i, sk in enumerate(stem_tokens):  
+		for st in stem_kws:  
+			if sk==st:  
+				kws_index.append(i)
+
+
+	## print all keywrods found
+	# for i, s in enumerate(tokens):
+	# 	if i in kws_index:
+	# 		print(s)
+
+	kws_index = list(set(kws_index))
+	if len(kws_index)>0:
+		hasKWS = True		
+		# print(kws_index)
+
 	output = {"hasKWS": hasKWS, "kws_index": kws_index}
 	return output
 
@@ -212,23 +225,20 @@ def identityPSD(input):
 	kws_index = input[1]
 	uds = getDependency(sen)
 	# print(uds)
-# 	uds = [[(('estimated', 'VBN', 11), 'nsubjpass', ('cost', 'NN', 2)), (('cost', 'NN', 2), 'det', ('The', 'DT', 1)), (('cost', 'NN', 2), 'nmod', ('cyber-crime', 'NN', 4)), (('cyber-crime', 'NN', 4), 'case', ('of', 'IN', 3)), (('cyber-crime', 'NN'
-# , 4), 'nmod', ('economy', 'NN', 8)), (('economy', 'NN', 8), 'case', ('for', 'IN', 5)), (('economy', 'NN', 8), 'det', ('the', 'DT', 6)), (('economy', 'NN', 8), 'amod', ('global', 'JJ', 7)), (('estimated', 'VBN', 11), 'aux', ('has', 'VBZ',
-#  9)), (('estimated', 'VBN', 11), 'auxpass', ('been', 'VBN', 10)), (('estimated', 'VBN', 11), 'nmod', ('$', '$', 13)), (('$', '$', 13), 'case', ('at', 'IN', 12)), (('$', '$', 13), 'nummod', ('billion', 'CD', 15)), (('billion', 'CD', 15),
-# 'compound', ('445', 'CD', 14)), (('$', '$', 13), 'advmod', ('annually', 'RB', 16))]]
-	
+
 	psd_list = coverPSD(uds, kws_index)
-	sd_list = kws_index + psd_list
-	print(sd_list)
+	sd_list = list(set(kws_index + psd_list))
+	# print(sd_list)
 	text = []
 	tokens = word_tokenize(sen)
 	for i, s in enumerate(tokens):
 		if i in sd_list:
+			print(s)
 			tts = "<input onclick='responsiveVoice.speak(\\\"" + s + "\\\");' type='button' value='🔊 xxxxx' />"
 			text.append(tts) 
 		else:
 			text.append(s)
-	result = ' '.join(text) + '. '
+	result = ' '.join(text)
 
 	return result
 
@@ -239,8 +249,8 @@ def getDependency(sen):
 	uds = [list(parse.triples()) for parse in dep_parser.raw_parse(sen)]
 	# for parse in dep_parser.raw_parse(sen):
 	# 	print(parse)
-	# for u in uds[0]:
-	# 	print(u)
+	for u in uds[0]:
+		print(u)
 	return uds
 
 
@@ -249,7 +259,6 @@ def coverPSD(uds, kws_index):
 	output = ""
 	# pw = []
 	psd = []
-	print(psd)
 	noun = ['NN', 'NNS', 'NNP', 'NNPS']
 	verb = ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']
 	number = ['CD']
@@ -265,7 +274,6 @@ def coverPSD(uds, kws_index):
 				# pw.append(u[2][0])
 			if u[0][1] in noun and u[2][1] in number and u[1] in re2:
 				psd.append(u[2][2]-1)
-				# pw.append(u[2][0])
 			if u[0][1] in number and u[2][1] in number and u[1] in re3:
 				psd.append(u[2][2]-1)
 				# pw.append(u[2][0])
@@ -276,16 +284,25 @@ def coverPSD(uds, kws_index):
 				psd.append(u[2][2]-1)
 				# pw.append(u[2][0])
 				coverPSD(uds, [u[2][2]-1])
+
+		if u[2][2]-1 in kws_index:
+			if u[0][1] in noun and u[2][1] in noun and u[1] in re1:
+				psd.append(u[0][2]-1)
+			if u[0][1] in noun and u[2][1] in number and u[1] in re2:
+				psd.append(u[0][2]-1)
+			if u[0][1] in number and u[2][1] in number and u[1] in re3:
+				psd.append(u[0][2]-1)
+
 	# print(pw)
 	return psd
 
 
 
-def sortKey(kws, cats):
+def sortKey(kset, cats):
 	result = {}
 	for c in cats:
 		result[c] = []
-		for k in kws:
+		for k in kset:
 			if k.category == c:
 				result[c].append(k.name.lower())
 
