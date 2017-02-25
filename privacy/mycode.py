@@ -4,8 +4,6 @@ from urllib import request, error
 from bs4 import BeautifulSoup
 from nltk.parse.stanford import StanfordDependencyParser
 import time
-# import threading
-# import multiprocessing
 from multiprocessing import Pool
 import jsonrpclib
 
@@ -111,6 +109,7 @@ def doDoc(kws, path):
 
 
 def processRaw(kws, raw):
+	result = ""
 	# kws = ["prove", "identity", "approval", "gain", "allowed", "password", "passwords", "username", "authentication", "access", "code" , "secret"]
 	# kws = ["cost", "cyber-crime1", "estimated", "$", "445", "billion", "Cyber", "espionage", "stealing", "individuals", "information1", "800", "million", "people", "Financial", "losses", "cyber-theft", "lose", "jobs"]
 	# if raw:
@@ -133,32 +132,153 @@ def processRaw(kws, raw):
 	# 	result = 'The url is invalid or the file is not found!'
 
 
-	senlist = raw.split('. ')
-	# for index, s in enumerate(senlist):
+	# uds = [list(parse.triples()) for parse in dep_parser.raw_parse(raw)]
+
+	sen_list = raw.split('. ')
+	sen_list = list(filter(None, sen_list))
+	print(sen_list)
+	pss_input = []
+	pss_list = []
+	for index, sen in enumerate(sen_list):
+		if len(sen)>0:
+			k = searchKWS(sen, kws)
+			if k['hasKWS']:
+				pss_input.append([sen, k['kws_index']])
+				pss_list.append(index)
+
+
+	print(pss_input)
+	print(pss_list)
+
+	# for index, s in enumerate(sen_list):
 	# 	print('('+ str(index) + ')' +s)
 
-	start = time.time()
+	# kws_list = 
 
-	# uds = Pool().map(getDependency, senlist)
+	# uds_list = Pool().map(getDependency, sen_list)
 
-	uds = getDependency(raw)
+	# uds_list = getDependency(raw)
 
-	# print(uds)
+	# print(uds_list)
 
-	# uds = [list(parse.triples()) for parse in dep_parser.raw_parse(raw)]
-	end = time.time()
-	print('Processing time: ' + str(end-start))
-	# print(uds)
+	out_list = []
+	if len(pss_input)>0:
+		start = time.time()
+		out_list = Pool().map(identityPSD, pss_input)
+		end = time.time()
+	else:
+		result = raw
+
+
+	output = []
+	index_out = 0
+	for i, s in enumerate(sen_list):
+		if i in pss_list:
+			output.append(out_list[index_out])
+			index_out +=1
+		else:
+			output.append(s+'.')
+
+	result = ' '.join(output)
+
+
+	print('Processing Time: ' + str(end-start))
+
 	tokens = word_tokenize(raw)
 	print(len(tokens))
-	result = 'done!'
+
 	return result + '<br><br><br><br><br><br>'
+
+
+
+def searchKWS(sen, kws):
+	hasKWS = False
+	kws_index = []
+	tokens = word_tokenize(sen)
+	if tokens[0]=="The":
+		hasKWS = True
+		kws_index = [1, 10, 12, 14] 
+	for i, s in enumerate(tokens):
+		if i in kws_index:
+			print(s)
+	output = {"hasKWS": hasKWS, "kws_index": kws_index}
+	return output
+
+
+
+def identityPSD(input):
+	result = "" 
+	sen = input[0]
+	kws_index = input[1]
+	uds = getDependency(sen)
+	# print(uds)
+# 	uds = [[(('estimated', 'VBN', 11), 'nsubjpass', ('cost', 'NN', 2)), (('cost', 'NN', 2), 'det', ('The', 'DT', 1)), (('cost', 'NN', 2), 'nmod', ('cyber-crime', 'NN', 4)), (('cyber-crime', 'NN', 4), 'case', ('of', 'IN', 3)), (('cyber-crime', 'NN'
+# , 4), 'nmod', ('economy', 'NN', 8)), (('economy', 'NN', 8), 'case', ('for', 'IN', 5)), (('economy', 'NN', 8), 'det', ('the', 'DT', 6)), (('economy', 'NN', 8), 'amod', ('global', 'JJ', 7)), (('estimated', 'VBN', 11), 'aux', ('has', 'VBZ',
+#  9)), (('estimated', 'VBN', 11), 'auxpass', ('been', 'VBN', 10)), (('estimated', 'VBN', 11), 'nmod', ('$', '$', 13)), (('$', '$', 13), 'case', ('at', 'IN', 12)), (('$', '$', 13), 'nummod', ('billion', 'CD', 15)), (('billion', 'CD', 15),
+# 'compound', ('445', 'CD', 14)), (('$', '$', 13), 'advmod', ('annually', 'RB', 16))]]
+	
+	psd_list = coverPSD(uds, kws_index)
+	sd_list = kws_index + psd_list
+	print(sd_list)
+	text = []
+	tokens = word_tokenize(sen)
+	for i, s in enumerate(tokens):
+		if i in sd_list:
+			tts = "<input onclick='responsiveVoice.speak(\\\"" + s + "\\\");' type='button' value='🔊 xxxxx' />"
+			text.append(tts) 
+		else:
+			text.append(s)
+	result = ' '.join(text) + '. '
+
+	return result
+
 
 
 def getDependency(sen):
 	dep_parser=StanfordDependencyParser(model_path="edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz")
 	uds = [list(parse.triples()) for parse in dep_parser.raw_parse(sen)]
-	return str(uds)
+	# for parse in dep_parser.raw_parse(sen):
+	# 	print(parse)
+	# for u in uds[0]:
+	# 	print(u)
+	return uds
+
+
+
+def coverPSD(uds, kws_index):
+	output = ""
+	# pw = []
+	psd = []
+	print(psd)
+	noun = ['NN', 'NNS', 'NNP', 'NNPS']
+	verb = ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']
+	number = ['CD']
+	re1 = ['compound', 'nmod', 'conj']
+	re2 = ['nummod']
+	re3 = ['compound']
+	re4 = ['nsubj', 'dobj' ,'nmod', 'nsubjpass']
+	re5 = ['xcomp', 'ccomp', 'conj']
+	for u in uds[0]:
+		if u[0][2]-1 in kws_index:
+			if u[0][1] in noun and u[2][1] in noun and u[1] in re1:
+				psd.append(u[2][2]-1)
+				# pw.append(u[2][0])
+			if u[0][1] in noun and u[2][1] in number and u[1] in re2:
+				psd.append(u[2][2]-1)
+				# pw.append(u[2][0])
+			if u[0][1] in number and u[2][1] in number and u[1] in re3:
+				psd.append(u[2][2]-1)
+				# pw.append(u[2][0])
+			if u[0][1] in verb and u[2][1] in noun and u[1] in re4:
+				psd.append(u[2][2]-1)
+				# pw.append(u[2][0])
+			if u[0][1] in verb and u[2][1] in verb and u[1] in re5:
+				psd.append(u[2][2]-1)
+				# pw.append(u[2][0])
+				coverPSD(uds, [u[2][2]-1])
+	# print(pw)
+	return psd
+
 
 
 def sortKey(kws, cats):
@@ -190,7 +310,18 @@ def testRaw(raw, stops):
 
 
 
+# def triples(node = None):
+# 	print("triples")
 
+#     if not node:
+#         node = parse.root
+
+#     head = (node['word'], node['ctag'], node['address'])
+#     for i in sorted(chain.from_iterable(node['deps'].values())):
+#         dep = parse.get_by_address(i)
+#         yield (head, dep['rel'], (dep['word'], dep['ctag'], node['address']))
+#         for triple in triples(dep):
+#             yield triple
 
 
 
