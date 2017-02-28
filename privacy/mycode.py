@@ -3,17 +3,18 @@ from nltk import word_tokenize
 from urllib import request, error
 from bs4 import BeautifulSoup
 from nltk.parse.stanford import StanfordDependencyParser
-import time
+# import time
 from multiprocessing import Pool
-from nltk.corpus import stopwords
-
+# from nltk.corpus import stopwords
+from nltk.corpus import wordnet
 
 nltk.data.path.append('./nltk_data/')
 
-
-def doWeb(kset, url):
+## process webpages
+def doWeb(kws, url):
 	result = ''
 	title = ''
+	url = url.strip()
 	if url[0:4] == 'eg: ':
 		url = url[4:]
 	if url[0] == ':':
@@ -29,10 +30,11 @@ def doWeb(kset, url):
 	else:
 		print('url2: ' + url)
 		try:
+			## load a webpage
 			html = request.urlopen(url).read().decode('utf8')
 			raw = BeautifulSoup(html, 'html.parser').body.get_text()
 			title = BeautifulSoup(html, 'html.parser').title.string
-			result = processRaw(kset, raw)
+			result = processRaw(kws, raw)
 		except Exception as e:
 			print(e)
 			result = 'Exception: ' + str(e)
@@ -40,9 +42,11 @@ def doWeb(kset, url):
 	return '<strong>' + title + '<br>(' + url + ')</strong><br><br>' + result
 
 
-def doDoc(kset, path):
+## process documents
+def doDoc(kws, path):
 	result = ''
 	raw = ''
+	path = path.strip()
 	name = ntpath.basename(path)
 	if path[0:5] == 'web: ':
 		path = path[5:]
@@ -59,20 +63,23 @@ def doDoc(kset, path):
 		if '.' in name and name.split('.')[1].lower() == 'txt':
 			if path[1:3] == ':\\':
 				path = 'file:///' + path
-			print('txt: ' + path)
+			# print('txt: ' + path)
+			## load a text file
 			raw = request.urlopen(path).read().decode('utf8')
-			result = processRaw(kset, raw)
+			result = processRaw(kws, raw)
 		
 		# tpdf file
 		elif '.' in name and name.split('.')[1].lower() == 'pdf':
 			if path[1:3] == ':\\':
 				path = 'file:///' + path
-			print('pdf: ' + path)
+			# print('pdf: ' + path)
 
 			# pdfReader = PyPDF2.PdfFileReader(open(path, 'rb'))
+
 			remote_file = request.urlopen(path).read()
 			memory_file = io.BytesIO(remote_file)
 
+			## load a pdf file
 			pdfReader = PyPDF2.PdfFileReader(memory_file)
 			pnums = pdfReader.getNumPages()
 			if pnums>3:
@@ -80,24 +87,25 @@ def doDoc(kset, path):
 
 			for i in range(pnums):
 				raw += pdfReader.getPage(i).extractText()
-			result = processRaw(kset, raw)
+			result = processRaw(kws, raw)
 		
 		# docx file
 		elif '.' in name and name.split('.')[1].lower() == 'docx':
 			# if path[1:3] == ':\\':
 			# 	path = 'file:///' + path
-			print('docx: ' + path)
+			# print('docx: ' + path)
 			# remote_file = request.urlopen(path).read()
 			# memory_file = io.BytesIO(remote_file).getvalue()
 			# print(memory_file.decode('utf8'))
 			# print(str(memory_file,'utf-8'))
 
+			## load a docx file
 			doc = docx.Document(path)
 			fullText = []
 			for para in doc.paragraphs:
 				fullText.append(para.text)
 			raw = '\n'.join(fullText)
-			result = processRaw(kset, raw)
+			result = processRaw(kws, raw)
 
 		else:
 			result = 'Please use Web for webpage processing!'
@@ -109,16 +117,9 @@ def doDoc(kset, path):
 	return '<strong>' + name + '<br>(' + path + ')</strong><br><br>' + result
 
 
-def processRaw(kset, raw):
+## process raw extracted from original resource
+def processRaw(kws, raw):
 	result = ""
-	# second = 0.2
-
-	cats = ['financial','cyber']
-	kws = []
-	for k in kset:
-		if k.category.name in cats:
-			kws.append(k.name.lower())
-	# print(kws)
 
 	sent_detector = nltk.data.load('tokenizers/punkt/english.pickle')
 	sen_list = sent_detector.tokenize(raw.strip())
@@ -127,16 +128,24 @@ def processRaw(kset, raw):
 
 	pss_input = []
 	pss_list = []
+	# kws_found = []
+	# start = time.time()
 	for index, sen in enumerate(sen_list):
 		if len(sen)>0:
 			k = searchKWS(sen, kws)
 			if k['hasKWS']:
 				pss_input.append([sen, k['kws_index']])
 				pss_list.append(index)
+				# kws_found += k['kws_found']
 
+	# end = time.time()
+	# t = end-start		
+	# print('Time of searchKWS: ' + str(t))
 
-	print(pss_input)
-	print(pss_list)
+	# kws_found = list(set(kws_found))
+	# print('keywords found: ' + str(kws_found))
+	# print(pss_input)
+	# print(pss_list)
 
 
 	# uds_list = getDependency(raw)
@@ -145,11 +154,12 @@ def processRaw(kset, raw):
 
 	out_list = []
 	if len(pss_input)>0:
-		start = time.time()
-		out_list = Pool().map(identityPSD, pss_input)
-		end = time.time()
-		t = end-start
-		print('Processing Time: ' + str(t))
+		# start = time.time()
+		## multiprocessing
+		out_list = Pool().map(coverPSD, pss_input)
+		# end = time.time()
+		# t = end-start
+		# print('Processing Time: ' + str(t))
 	else:
 		result = raw
 
@@ -163,18 +173,21 @@ def processRaw(kset, raw):
 		else:
 			output.append(s)
 
+	# result = 'keywords: ' + str(kws_found) + '<br><br>' + ' '.join(output)
 	result = ' '.join(output)
 
-	tokens = word_tokenize(raw)
-	print(len(tokens))
+	# tokens = word_tokenize(raw)
+	# print(len(tokens))
 
 	return result + '<br><br><br><br><br><br>'
 
 
 
+## search keywords in an input document
 def searchKWS(sen, kws):
 	hasKWS = False
 	kws_index = []
+	sen = sen.strip()
 	tokens = [t.lower() for t in word_tokenize(sen)]
 
 	## round 1
@@ -204,36 +217,39 @@ def searchKWS(sen, kws):
 				kws_index.append(i)
 
 
-	## print all keywrods found
+	# kws_found = []
+	# # list all keywrods found
 	# for i, s in enumerate(tokens):
 	# 	if i in kws_index:
-	# 		print(s)
+	# 		kws_found.append(s)
 
 	kws_index = list(set(kws_index))
 	if len(kws_index)>0:
 		hasKWS = True		
 		# print(kws_index)
 
-	output = {"hasKWS": hasKWS, "kws_index": kws_index}
+	# output = {"hasKWS":hasKWS, "kws_index":kws_index, "kws_found":kws_found}
+	output = {"hasKWS":hasKWS, "kws_index":kws_index}
 	return output
 
 
 
-def identityPSD(input):
+## replace PSD with ToS
+def coverPSD(input):
 	result = "" 
 	sen = input[0]
 	kws_index = input[1]
 	uds = getDependency(sen)
 	# print(uds)
 
-	psd_list = coverPSD(uds, kws_index)
+	psd_list = identityPSD(uds, kws_index)
 	sd_list = list(set(kws_index + psd_list))
 	# print(sd_list)
 	text = []
 	tokens = word_tokenize(sen)
 	for i, s in enumerate(tokens):
 		if i in sd_list:
-			print(s)
+			# print(s)
 			tts = "<input onclick='responsiveVoice.speak(\\\"" + s + "\\\");' type='button' value='🔊 xxxxx' />"
 			text.append(tts) 
 		else:
@@ -244,19 +260,19 @@ def identityPSD(input):
 
 
 
+## run standford dependency parser
 def getDependency(sen):
 	dep_parser=StanfordDependencyParser(model_path="edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz")
 	uds = [list(parse.triples()) for parse in dep_parser.raw_parse(sen)]
 	# for parse in dep_parser.raw_parse(sen):
 	# 	print(parse)
-	for u in uds[0]:
-		print(u)
+	# for u in uds[0]:
+	# 	print(u)
 	return uds
 
 
-
-def coverPSD(uds, kws_index):
-	output = ""
+## identify popentially sensitive data
+def identityPSD(uds, kws_index):
 	# pw = []
 	psd = []
 	noun = ['NN', 'NNS', 'NNP', 'NNPS']
@@ -298,11 +314,33 @@ def coverPSD(uds, kws_index):
 
 
 
-def sortKey(kset, cats):
+## search WordNet for synonyms of an input word
+def searchWN(word):
+	result = []
+	synsets = wordnet.synsets(word)
+	for synset in synsets:
+		name = synset.name()
+		t = name.split('.')[1]
+		if t == 'n':
+			pos = 'Noun'
+		if t == 'v':
+			pos = 'Verb'
+		if t == 's':
+			pos = 'Number'
+
+		definition = synset.definition()
+		lemma_names = synset.lemma_names()
+		result.append({'name':name, 'pos':pos, 'def':definition, 'lemma':lemma_names})
+
+	return result
+
+
+## sort keywords set
+def sortKey(kws, cats):
 	result = {}
 	for c in cats:
 		result[c] = []
-		for k in kset:
+		for k in kws:
 			if k.category == c:
 				result[c].append(k.name.lower())
 

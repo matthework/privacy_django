@@ -29,9 +29,11 @@
     </div><!-- /input-group -->
   </div><!-- /.col-lg-6 -->
 </div><!-- /.row -->
-</form>
 <p class="text-muted">eg: https://myservermatt.herokuapp.com/index.html</p>
+<big>{% for c in cats %} {{ c }} <input type="checkbox" name="checks" value="{{c}}">, {% endfor %}</big>
+</form>
 
+<br>
 <br>
 <p class="text-justify">
 <script>

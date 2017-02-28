@@ -3,7 +3,7 @@
 {% block content %}
 
 {% load staticfiles %}
-<link rel="stylesheet" href="{% static 'css/keyword.css' %}">
+<link rel="stylesheet" href="{% static 'css/kws.css' %}">
 
 <!-- Header -->
 <div class="docs-header">
@@ -17,8 +17,8 @@
 	<div>
 	<p class="text-justify">
 	<h2><a href="/admin/privacy/category">{{ key }}</a></h2>
-	{% for kw in value %}
-        <a href="/kw">{{ kw }}</a>
+	{% for k in value %}
+        <a href="{% url 'wordnet' k key %}">{{ k }}, </a>
     {% endfor %}
     </p>
     </div>

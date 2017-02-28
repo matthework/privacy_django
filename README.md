@@ -1,6 +1,26 @@
-# privacy_django
+# privacy_django (master project by matt wang 2017)
 
-command  
+
+Requirements:
+
+Python 3.5.1 (the major programming language for this project) 
+
+Django 1.10.5 (the web development framework)  
+
+NLTK 3.2.2 (the natural language toolkit)  
+
+Beautifulsoup4 4.5.3 (the CSS styling library for web application)  
+
+dj-database-url 0.4.2 (the library managing the database in Django)  
+
+PyPDF2 1.26.0 (the library used for extracting texts from pdf file)  
+
+python-docx 0.8.6 (the library used for extracting texts from docx file)  
+
+ResponseVoice 1.4.0 (the text-to-speech library)   
+
+
+Commands:   
 
 $ mkdir django_app  
 
@@ -71,11 +91,6 @@ $ [lancaster.stem(t) for t in aa]
 
 $ [wnl.lemmatize(t) for t in aa]  
 
-$ for d in ddp:  
-	for r in rr:  
-		if d==r:  
-			print(d)  
-
 $ from nltk.parse.stanford import StanfordDependencyParser  
 
 $ dep_parser=StanfordDependencyParser(model_path="edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz")  
@@ -89,5 +104,7 @@ $ pip install unidecode
 $ pip install jsonrpclib  
 
 $ pip install jsonrpclib-pelix  
+
+$ from nltk.corpus import wordnet as wn  
 
 

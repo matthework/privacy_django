@@ -1,0 +1,52 @@
+{% extends 'privacy/base.html' %}
+
+{% block content %}
+
+
+<!-- Header -->
+<div class="docs-header">
+   <h1 class=" col-md-10 col-md-offset-1">WordNet</h1>
+</div>
+
+<!-- Content -->
+<div class="col-md-10 col-md-offset-1">
+
+<h2><i>{{word}} ({{category}})</i></h2>
+<br>
+<br>
+
+<form action="#" method="get">
+<p class="text-justify"><big>
+{% for synset in synsets %}
+	<a>Synset: {{ synset.name }}</a>
+	<br>
+	Type: {{ synset.pos }}
+	<br>
+	Definition: {{ synset.def }}
+	<br>
+	Synonyms: {% for l in synset.lemma %} {{ l }} <input type="checkbox" name="checks[]" value="{{l}}">, {% endfor %}
+	<br>
+	<br>
+{% endfor %}
+
+</p>
+<br>
+<button type="submit" class="btn btn-default" value="Add" name="wnbtn">Add New</button><br>
+</form>
+<br>
+<br>
+{% if synonyms %}
+{{synonyms}}
+{% endif %}
+</big>
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+</div>
+
+
+{% endblock %}

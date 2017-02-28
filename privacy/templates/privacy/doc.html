@@ -9,7 +9,7 @@
 <!-- Content -->
 <div class="col-md-7 col-md-offset-1">
 
-<h4>Please load a document. (type supported: docx, pdf, txt)</h4>
+<h4>Please load a document. (type supported: txt, pdf, docx)</h4>
 <form action="#" method="get">
 <div class="row">
 <div class="col-lg-8">
@@ -21,10 +21,13 @@
     </div><!-- /input-group -->
   </div><!-- /.col-lg-6 -->
 </div><!-- /.row -->
-</form>
 <p class="text-muted">web: https://dl.dropboxusercontent.com/u/39700844/docs/test.txt<br>local: C:\Users\MATT\Dropbox\Public\docs\test.txt</p>
+<big>{% for c in cats %} {{ c }} <input type="checkbox" name="checks" value="{{c}}">, {% endfor %}</big>
+</form>
 
 
+
+<br>
 <br>
 <p class="text-justify">
 <script>
