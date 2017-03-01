@@ -3,7 +3,7 @@ from nltk import word_tokenize
 from urllib import request, error
 from bs4 import BeautifulSoup
 from nltk.parse.stanford import StanfordDependencyParser
-# import time
+import time
 from multiprocessing import Pool
 # from nltk.corpus import stopwords
 from nltk.corpus import wordnet
@@ -154,12 +154,12 @@ def processRaw(kws, raw):
 
 	out_list = []
 	if len(pss_input)>0:
-		# start = time.time()
+		start = time.time()
 		## multiprocessing
 		out_list = Pool().map(coverPSD, pss_input)
-		# end = time.time()
-		# t = end-start
-		# print('Processing Time: ' + str(t))
+		end = time.time()
+		t = end-start
+		print('Processing Time: ' + str(t))
 	else:
 		result = raw
 
@@ -176,8 +176,8 @@ def processRaw(kws, raw):
 	# result = 'keywords: ' + str(kws_found) + '<br><br>' + ' '.join(output)
 	result = ' '.join(output)
 
-	# tokens = word_tokenize(raw)
-	# print(len(tokens))
+	tokens = word_tokenize(raw)
+	print(len(tokens))
 
 	return result + '<br><br><br><br><br><br>'
 
