@@ -19,6 +19,13 @@ python-docx 0.8.6 (the library used for extracting texts from docx file)
 
 ResponseVoice 1.4.0 (the text-to-speech library)   
 
+open idle  
+import nltk  
+nltk.download()  
+download 'tokenizers' to C:\nltk_data  
+download 'stanford-parser-full-2016-10-31.zip' from Standford website, then unzip it  
+copy 'stanford-parser.jar' and 'stanford-parser-3.7.0-models.jar' to C:\nltk_data\stanford-parser  
+
 
 Commands:   
 
