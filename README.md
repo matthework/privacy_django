@@ -2,7 +2,7 @@
 
 Requirements:
 
-Python 3.5.1 (the major programming language for this project) 
+Python 3.5.1 (the major programming language for this project)  
 Django 1.10.5 (the web development framework)  
 NLTK 3.2.2 (the natural language toolkit)  
 Beautifulsoup4 4.5.3 (the CSS styling library for web application)  
@@ -61,9 +61,7 @@ $ tag_fd = nltk.FreqDist(tag for (word, tag) in tg)
 $ tag_fd.most_common()  
 $ re.findall(r'\w+|\S\w*', raw)  
 $ aa=re.findall(r'\b([a-zA-Z]+)\b', raw)  
-$ for s in stops:  
-	while s in aa: aa.remove(s)  
-$ porter = nltk.PorterStemmer()   
+$ porter = nltk.PorterStemmer()  
 $ [porter.stem(t) for t in aa]  
 $ [lancaster.stem(t) for t in aa]  
 $ [wnl.lemmatize(t) for t in aa]  
