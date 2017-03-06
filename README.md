@@ -24,7 +24,7 @@ pip freeze > requirements.txt
 open idle  
 import nltk  
 nltk.download()  
-download 'tokenizers' to C:\nltk_data  
+download 'tokenizers' 'wordnet' to C:\nltk_data  
 download 'stanford-parser-full-2016-10-31.zip' from standford website, then unzip it  
 copy 'stanford-parser.jar' and 'stanford-parser-3.7.0-models.jar' to C:\nltk_data\stanford-parser  
 set the CLASSPATH='C:\nltk_data\stanford-parser'
